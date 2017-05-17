@@ -1,0 +1,78 @@
+Data Structures and Algorithms
+Assignment 7 Answers
+Matthew Nelson 
+
+Q1: What publisher is located in GARDEN CITY?
+
+select pubid, publisher from pub
+where pcity = "GARDEN CITY";
+
+>> DOUBLEDAY AND COMPANY INC.
+
+
+Q2: How many books in the catalogue come from publishers in NEW YORK?
+
+select count(accno) from bib
+where loc = "NEW YORK";
+
+>> 39
+
+
+Q3: Find the average price of a book in the SOCIAL CHANGE subject category.
+
+select avg(price) from
+(select bib.accno, bib.title, bib.price, indx.subcode from bib
+left join indx
+ON bib.accno = indx.accno)
+inner join sub
+where sub.subject = "SOCIAL CHANGE"
+;
+
+
+>> 9.55
+
+Q4: How many books from SAN FRANCISCO publishers are about the subject of UNIVERSITIES AND COLLEGES?
+
+select count(title) from
+(select accno, title, price, code, sub.subject from
+(select bib.accno, bib.title, bib.price, indx.subcode AS code from bib
+left join indx
+ON bib.accno = indx.accno
+WHERE bib.loc = "SAN FRANCISCO")
+left join sub
+ON code = sub.subcode
+WHERE subject = "UNIVERSITIES AND COLLEGES")
+;
+
+>> 2
+
+
+Q5: Books in which subject category have the highest average price?
+
+select subject, avg(price) AS average from
+(select accno, title, price, code, sub.subject from
+(select bib.accno, bib.title, bib.price, indx.subcode AS code from bib
+left join indx
+ON bib.accno = indx.accno)
+left join sub
+ON code = sub.subcode)
+GROUP BY subject
+ORDER BY average desc
+;
+
+>> COMMUNICATION - ECONOMIC ASPECTS $35 Avg
+COMMUNICATION POLICY - US $35 Avg
+
+
+Q6: Among books costing 15 dollars or more, which publisher ranks highest in terms of average book HEIGHT?
+
+select publisher, avg(height) AS height_avg from
+(select bib.accno, bib.title, bib.loc, bib.height, bib.price, bib.pubid, pub.publisher from bib
+left join pub
+ON bib.pubid = pub.pubid
+WHERE bib.price >= 15)
+GROUP BY publisher
+ORDER BY height_avg DESC
+;
+
+>> DIABLO PRESS	28.0
